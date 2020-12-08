@@ -1,2 +1,5 @@
 .dragon
 .DS_Store
+build
+staging
+packages
