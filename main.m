@@ -138,7 +138,7 @@ int main(int argc, const char *argv[]) {
                     setVolume(volumeStep * kVolumeStep);
                 }
             }
-            else if ([@"nowplaying" isEqualToString:action]) {
+            else if ([@"nowplaying" isEqualToString:action] || [@"np" isEqualToString:action]) {
                 nowPlayingInformation(^(CFDictionaryRef information) {
                     NSString *title = @"(unknown)";
                     NSString *artist = @"(unknown)";
