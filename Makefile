@@ -34,7 +34,7 @@ package: build/media
 	$(SED) -i ':a; s/@DEB_MEDIA_V@/$(DEB_MEDIA_V)/g; ta' staging/DEBIAN/control; \
 	$(SED) -i ':a; s/@DEB_MAINTAINER@/$(DEB_MAINTAINER)/g; ta' staging/DEBIAN/control; \
 	$(SED) -i ':a; s/@DEB_ARCH@/$(DEB_ARCH)/g; ta' staging/DEBIAN/control; \
-	cd staging && find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' -printf '"%P" ' | xargs md5sum > DEBIAN/md5sum; \
+	cd staging && find . -type f ! -regex '.*.hg.*' ! -regex '.*?debian-binary.*' ! -regex '.*?DEBIAN.*' | xargs md5sum > DEBIAN/md5sum; \
 	cd ..; \
 	echo "Installed-Size: $$SIZE" >> staging/DEBIAN/control
 	$(FAKEROOT) dpkg-deb -z9 -b staging build
