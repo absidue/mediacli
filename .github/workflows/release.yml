@@ -11,12 +11,12 @@ jobs:
       - name: 'Set environment variables'
         shell: bash
         run: |
-          MEDIACLI_TAG="${{ github.release.tag_name }}"
+          MEDIACLI_TAG="${{ github.event.release.tag_name }}"
           echo "MEDIACLI_TAG=$MEDIACLI_TAG" >> $GITHUB_ENV
           echo "MEDIACLI_VERSION=${MEDIACLI_TAG:1}" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: brew install make ldid sed install fakeroot dpkg
+        run: brew install make ldid gnu-sed gnu-tar coreutils fakeroot dpkg
 
       - name: Download and extract tarball
         run: |
@@ -30,4 +30,6 @@ jobs:
         run: make package
 
       - name: 'Upload artifacts'
-        run: gh release upload $MEDIACLI_TAG mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION/build/me.absidue.mediacli_${MEDIACLI_VERSION}_iphoneos-arm.deb
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload $MEDIACLI_TAG mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION/build/me.absidue.mediacli_${MEDIACLI_VERSION}_iphoneos-arm.deb -R absidue/mediacli
