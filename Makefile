@@ -23,7 +23,7 @@ build/media: main.m ent.plist
 
 install: build/media
 	$(INSTALL) -Dm755 build/media $(DESTDIR)$(PREFIX)/bin/media
-	$(INSTALL) -Dm644 COPYING $(DESTDIR)$(PREFIX)/share/media/COPYING
+	$(INSTALL) -Dm644 COPYING $(DESTDIR)$(PREFIX)/share/mediacli/COPYING
 
 package: build/media
 	rm -rf staging
