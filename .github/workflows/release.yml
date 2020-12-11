@@ -1,0 +1,33 @@
+name: 'Upload Release'
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - name: 'Set environment variables'
+        shell: bash
+        run: |
+          MEDIACLI_TAG="${{ github.release.tag_name }}"
+          echo "MEDIACLI_TAG=$MEDIACLI_TAG" >> $GITHUB_ENV
+          echo "MEDIACLI_VERSION=${MEDIACLI_TAG:1}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: brew install make ldid sed install fakeroot dpkg
+
+      - name: Download and extract tarball
+        run: |
+          wget -qO mediacli-$MEDIACLI_VERSION.tar.gz "https://github.com/absidue/mediacli/archive/$MEDIACLI_TAG.tar.gz"
+          gtar -xf "mediacli-$MEDIACLI_VERSION.tar.gz"
+      - name: 'Create xz tarball'
+        run: 'gtar -cJf mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION'
+
+      - name: 'Build MediaCLI'
+        working-directory: mediacli-${{ env.MEDIACLI_VERSION }}
+        run: make package
+
+      - name: 'Upload artifacts'
+        run: gh release upload $MEDIACLI_TAG mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION/build/me.absidue.mediacli_${MEDIACLI_VERSION}_iphoneos-arm.deb
