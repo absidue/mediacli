@@ -20,10 +20,14 @@ jobs:
 
       - name: Download and extract tarball
         run: |
-          wget -qO mediacli-$MEDIACLI_VERSION.tar.gz "https://github.com/absidue/mediacli/archive/$MEDIACLI_TAG.tar.gz"
-          gtar -xf "mediacli-$MEDIACLI_VERSION.tar.gz"
-      - name: 'Create xz tarball'
-        run: 'gtar -cJf mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION'
+          wget -qO mediacli.tar.gz "https://github.com/absidue/mediacli/archive/$MEDIACLI_TAG.tar.gz"
+          gtar -xf mediacli.tar.gz
+
+      - name: 'Create release tarballs'
+        run: |
+          rm -rf mediacli-$MEDIACLI_VERSION/.git{hub,ignore}
+          gtar -cJf mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION
+          gtar -czf mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION
 
       - name: 'Build MediaCLI'
         working-directory: mediacli-${{ env.MEDIACLI_VERSION }}
@@ -32,4 +36,4 @@ jobs:
       - name: 'Upload artifacts'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload $MEDIACLI_TAG mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION/build/me.absidue.mediacli_${MEDIACLI_VERSION}_iphoneos-arm.deb -R absidue/mediacli
+        run: gh release upload $MEDIACLI_TAG mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION/build/me.absidue.mediacli_${MEDIACLI_VERSION}_iphoneos-arm.deb -R ${{ github.repository }}
