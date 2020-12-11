@@ -16,18 +16,18 @@ jobs:
           echo "MEDIACLI_VERSION=${MEDIACLI_TAG:1}" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: brew install make ldid gnu-sed gnu-tar coreutils fakeroot dpkg
+        run: brew install make ldid gnu-sed coreutils fakeroot dpkg
 
       - name: Download and extract tarball
         run: |
           wget -qO mediacli.tar.gz "https://github.com/absidue/mediacli/archive/$MEDIACLI_TAG.tar.gz"
-          gtar -xf mediacli.tar.gz
+          tar -xf mediacli.tar.gz
 
       - name: 'Create release tarballs'
         run: |
           rm -rf mediacli-$MEDIACLI_VERSION/.git{hub,ignore}
-          gtar -cJf mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION
-          gtar -czf mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION
+          tar -cJf mediacli-$MEDIACLI_VERSION.tar.xz mediacli-$MEDIACLI_VERSION
+          tar -czf mediacli-$MEDIACLI_VERSION.tar.gz mediacli-$MEDIACLI_VERSION
 
       - name: 'Build MediaCLI'
         working-directory: mediacli-${{ env.MEDIACLI_VERSION }}
