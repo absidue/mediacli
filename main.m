@@ -164,21 +164,21 @@ int main(int argc, const char *argv[]) {
                         NSString *artist = @"(unknown)";
 
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoTitle)) {
-                            title = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoTitle);
+                            title = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoTitle));
                         }
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtist)) {
-                            artist = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtist);
+                            artist = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtist));
                         }
 
                         printf("\nTitle:  %s\nArtist: %s\n", [title UTF8String], [artist UTF8String]);
 
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoAlbum)) {
-                            NSString *album = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoAlbum);
+                            NSString *album = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoAlbum));
                             printf("\nAlbum:  %s\n", [album UTF8String]);
                         }
 
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoGenre)) {
-                            NSString *genre = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoGenre);
+                            NSString *genre = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoGenre));
                             printf("\nGenre:  %s\n", [genre UTF8String]);
                         }
 
@@ -191,8 +191,8 @@ int main(int argc, const char *argv[]) {
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkData)
                             && CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType)) {
 
-                            NSString *mime = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType);
-                            NSData *data = CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkData);
+                            NSString *mime = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType));
+                            NSData *data = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkData));
 
                             NSString *uri = [NSString stringWithFormat:@"data:%@;base64,%@", mime, [data base64EncodedStringWithOptions:0]];
 
