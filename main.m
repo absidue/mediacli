@@ -26,7 +26,7 @@ void setVolume(float volume) {
 }
 
 void help(const char *path) {
-    printf("\nUsage: %s action\n\n"
+    printf("\nUsage: %s command\n\n"
             "Available actions:\n"
             "Note: Not all apps support all actions!\n"
             " playpause, toggle   play if paused/pause if playing\n"
@@ -41,11 +41,14 @@ void help(const char *path) {
             " vol{step}           set volume to step 0 to 16\n"
             "\n"
             "Getting information:\n"
+            "Note: All commands in this section support an optional -j/--json option to enable JSON output\n"
+            "Usage: %s command [-j|--json]\n"
             " nowplaying, np      show now playing information\n"
             " artworkuri, awuri   get the artwork as a data URI\n"
+            "\n"
             "Help:\n"
             " help, -h, --help    show this message\n\n"
-            , path);
+            , path, path);
 }
 
 int volMatch(NSString *action) {
@@ -72,18 +75,35 @@ int volMatch(NSString *action) {
     }
 }
 
-void nowPlayingInformation(MRMediaRemoteGetNowPlayingInfoCompletion completion) {
+void nowPlayingInformation(BOOL allowNilInformation, MRMediaRemoteGetNowPlayingInfoCompletion completion) {
     __block CFRunLoopRef runLoop = CFRunLoopGetCurrent();
     MRMediaRemoteGetNowPlayingInfo(dispatch_get_main_queue(), ^(CFDictionaryRef information) {
         if (information != NULL) {
             completion(information);
 
         } else {
-            printf("\nNothing is playing right now :(\n\n");
+            if (allowNilInformation) {
+                completion(nil);
+            } else {
+                printf("\nNothing is playing right now :(\n\n");
+            }
         }
         CFRunLoopStop(runLoop);
     });
     CFRunLoopRun();
+}
+
+void printAsJSON(id object) {
+    if ([NSJSONSerialization isValidJSONObject:object]) {
+        NSData *data = [NSJSONSerialization dataWithJSONObject:object options:0 error:nil];
+        NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+
+        printf("%s\n", [string UTF8String]);
+    } else {
+        printf("{}\n");
+        fprintf(stderr, "Unable to convert to JSON: %s", [[NSString stringWithFormat:@"%@", object] UTF8String]);
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, const char *argv[]) {
@@ -139,7 +159,7 @@ int main(int argc, const char *argv[]) {
                 }
 
                 else if ([@"nowplaying" isEqualToString:command] || [@"np" isEqualToString:command]) {
-                    nowPlayingInformation(^(CFDictionaryRef information) {
+                    nowPlayingInformation(NO, ^(CFDictionaryRef information) {
                         NSString *title = @"(unknown)";
                         NSString *artist = @"(unknown)";
 
@@ -167,7 +187,7 @@ int main(int argc, const char *argv[]) {
 
                 }
                 else if ([@"artworkuri" isEqualToString:command] || [@"awuri" isEqualToString:command]) {
-                    nowPlayingInformation(^(CFDictionaryRef information) {
+                    nowPlayingInformation(NO, ^(CFDictionaryRef information) {
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkData)
                             && CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType)) {
 
@@ -193,6 +213,70 @@ int main(int argc, const char *argv[]) {
                     return EXIT_FAILURE;
                 }
 
+                break;
+            }
+            case 3: {
+                NSString *command = [NSString stringWithUTF8String:argv[1]];
+                NSString *secondArg = [NSString stringWithUTF8String:argv[2]];
+
+                if ([@"--json" isEqualToString:secondArg] || [@"-j" isEqualToString:secondArg]) {
+
+                    if ([@"nowplaying" isEqualToString:command] || [@"np" isEqualToString:command]) {
+                        nowPlayingInformation(YES, ^(CFDictionaryRef information) {
+                            if (information != nil) {
+                                NSMutableDictionary *output = [NSMutableDictionary new];
+                                output[@"title"] = @"(unknown)";
+                                output[@"artist"] = @"(unknown)";
+
+                                if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoTitle)) {
+                                    output[@"title"] = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoTitle));
+                                }
+                                if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtist)) {
+                                    output[@"artist"] = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtist));
+                                }
+
+                                if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoAlbum)) {
+                                    output[@"album"] = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoAlbum));
+                                }
+
+                                if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoGenre)) {
+                                    output[@"genre"] = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoGenre));
+                                }
+
+                                printAsJSON(output);
+                            } else {
+                                printAsJSON(@{@"title": @"", @"artist": @""});
+                            }
+                        });
+                    }
+                    else if ([@"artworkuri" isEqualToString:command] || [@"awuri" isEqualToString:command]) {
+                        nowPlayingInformation(YES, ^(CFDictionaryRef information) {
+                            if (information != nil
+                                && CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkData)
+                                && CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType)) {
+
+                                NSString *mime = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkMIMEType));
+                                NSData *data = CFBridgingRelease(CFDictionaryGetValue(information, kMRMediaRemoteNowPlayingInfoArtworkData));
+
+                                printAsJSON(@{
+                                    @"uri": [NSString stringWithFormat:@"data:%@;base64,%@", mime, [data base64EncodedStringWithOptions:0]]
+                                });
+                            }
+                            else {
+                                printAsJSON(@{@"uri": @"data:,"});
+                            }
+                        });
+                    }
+                    else {
+                        fprintf(stderr, "\nUnknown command: %s\n", argv[1]);
+                        help(argv[0]);
+                        return EXIT_FAILURE;
+                    }
+                } else {
+                    fprintf(stderr, "\nUnknown second argument: %s\n", argv[2]);
+                    help(argv[0]);
+                    return EXIT_FAILURE;
+                }
                 break;
             }
             default: {
