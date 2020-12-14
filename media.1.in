@@ -1,0 +1,72 @@
+.TH MEDIA "1" "December 2020" "@MEDIA_VERSION@" "MediaCLI"
+.SH NAME
+media \- tool to control media playback
+.SH SYNOPSIS
+.B media
+.B command
+.br
+.B media
+.B command
+[\fIoption\fP]
+.SH DESCRIPTION
+.PP
+A tool to control and get information about media playback.
+The commands are split into two groups: actions and informational commands, actions change something, informational commands get information.
+.SH OPTIONS
+.SS Available actions:
+.PP
+Some actions may not be supported by all apps and players
+.TP
+.B playpause, toggle
+pause or play, toggle playback
+.TP
+.B play
+play, resumes playback
+.TP
+.B pause
+pause, suspend playback
+.TP
+.B previous, prev
+go back to previous track
+.TP
+.B next
+go forward to next track
+.TP
+.B back15
+rewind 15 seconds
+.TP
+.B forward15, fwd15
+forward 15 seconds
+.TP
+.B voldown, vol-
+decrease media volume by one step
+.TP
+.B volup, vol+
+increase media volume by one step
+.TP
+.B vol{step}
+set media volume to step 0 through 16
+.SS Getting information:
+.TP
+.B nowplaying, np
+show title and artist of the currently playing media, if available also shows the album and genre
+.TP
+.B artworkuri, awuri
+output the artwork as a base64 data URI
+.TP
+.B \-\-json, \-j
+Outputs the information as JSON. This option is supported by all commands in this section. Always produces valid JSON. If an error occurs it will be be printed to STDERR.
+.SS Help:
+.TP
+.B help, \-\-help, \-h
+shows the help message
+.SH BUGS
+Please report any bugs you find on the GitHub issue tracker <https://github.com/absidue/mediacli/issues/>.
+.SH AUTHOR
+Created by absidue
+.SH COPYRIGHT
+Copyright \(co 2020, absidue.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
