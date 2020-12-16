@@ -44,6 +44,7 @@ void help(const char *path) {
             "Note: All commands in this section support an optional -j/--json option to enable JSON output\n"
             "Usage: %s command [-j|--json]\n"
             " nowplaying, np      show now playing information\n"
+            " isplaying, ip       check if media is playing\n"
             " artworkuri, awuri   get the artwork as a data URI\n"
             "\n"
             "Help:\n"
@@ -186,6 +187,18 @@ int main(int argc, const char *argv[]) {
                     });
 
                 }
+                else if ([@"isplaying" isEqualToString:command] || [@"ip" isEqualToString:command]) {
+                    __block CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+                    MRMediaRemoteGetNowPlayingApplicationIsPlaying(dispatch_get_main_queue(), ^(Boolean isPlaying) {
+                        if (isPlaying) {
+                            printf("\nPlaying :)\n\n");
+                        } else {
+                            printf("\nNothing is playing right now :(\n\n");
+                        }
+                        CFRunLoopStop(runLoop);
+                    });
+                    CFRunLoopRun();
+                }
                 else if ([@"artworkuri" isEqualToString:command] || [@"awuri" isEqualToString:command]) {
                     nowPlayingInformation(NO, ^(CFDictionaryRef information) {
                         if (CFDictionaryContainsKey(information, kMRMediaRemoteNowPlayingInfoArtworkData)
@@ -248,6 +261,14 @@ int main(int argc, const char *argv[]) {
                                 printAsJSON(@{@"title": @"", @"artist": @""});
                             }
                         });
+                    }
+                    else if ([@"isplaying" isEqualToString:command] || [@"ip" isEqualToString:command]) {
+                        __block CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+                        MRMediaRemoteGetNowPlayingApplicationIsPlaying(dispatch_get_main_queue(), ^(Boolean isPlaying) {
+                            printAsJSON(@{@"playing": (isPlaying ? @YES : @NO)});
+                            CFRunLoopStop(runLoop);
+                        });
+                        CFRunLoopRun();
                     }
                     else if ([@"artworkuri" isEqualToString:command] || [@"awuri" isEqualToString:command]) {
                         nowPlayingInformation(YES, ^(CFDictionaryRef information) {

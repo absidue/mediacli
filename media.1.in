@@ -51,6 +51,9 @@ set media volume to step 0 through 16
 .B nowplaying, np
 show title and artist of the currently playing media, if available also shows the album and genre
 .TP
+.B isplaying, ip
+check if any media is playing
+.TP
 .B artworkuri, awuri
 output the artwork as a base64 data URI
 .TP
