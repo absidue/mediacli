@@ -15,6 +15,15 @@ void mediaRemoteCommand(MRCommand command) {
     [NSThread sleepForTimeInterval:0.01f];
 }
 
+void getVolume(MRMediaRemoteGetMediaPlaybackVolumeCompletion completion) {
+    __block CFRunLoopRef runLoop = CFRunLoopGetCurrent();
+    MRMediaRemoteGetMediaPlaybackVolume(dispatch_get_main_queue(), ^(float volume) {
+        completion(volume);
+        CFRunLoopStop(runLoop);
+    });
+    CFRunLoopRun();
+}
+
 void setVolume(float volume) {
     if (volume < 0) {
         volume = 0;
@@ -139,16 +148,14 @@ int main(int argc, const char *argv[]) {
                     mediaRemoteCommand(kMRSkipFifteenSeconds);
                 }
                 else if ([@"voldown" isEqualToString:command] || [@"vol-" isEqualToString:command]) {
-                    float currentVolume;
-                    [[AVSystemController sharedAVSystemController] getVolume:&currentVolume forCategory:kAVMediaCategory];
-
-                    setVolume(currentVolume - kVolumeStep);
+                    getVolume(^(float volume) {
+                        setVolume(volume - kVolumeStep);
+                    });
                 }
                 else if ([@"volup" isEqualToString:command] || [@"vol+" isEqualToString:command]) {
-                    float currentVolume;
-                    [[AVSystemController sharedAVSystemController] getVolume:&currentVolume forCategory:kAVMediaCategory];
-
-                    setVolume(currentVolume + kVolumeStep);
+                    getVolume(^(float volume) {
+                        setVolume(volume + kVolumeStep);
+                    });
                 }
                 // vol0 - vol16
                 else if ((volumeStep = volMatch(command)) != -2) {

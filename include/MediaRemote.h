@@ -150,6 +150,11 @@ extern "C" {
     void MRMediaRemoteSetCanBeNowPlayingApplication(Boolean can);
     void MRMediaRemoteSetNowPlayingInfo(CFDictionaryRef information);
 
+    /*
+     * Added by absidue
+     */
+    typedef void (^MRMediaRemoteGetMediaPlaybackVolumeCompletion)(float volume);
+    void MRMediaRemoteGetMediaPlaybackVolume(dispatch_queue_t queue, MRMediaRemoteGetMediaPlaybackVolumeCompletion completion);
 
 #if __cplusplus
 }
