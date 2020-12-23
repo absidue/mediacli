@@ -1,0 +1,21 @@
+name: Build MediaCLI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: 'Clone changes'
+        uses: actions/checkout@master
+      
+      - name: Install dependencies
+        run: brew install make ldid gnu-sed coreutils fakeroot dpkg
+
+      - name: 'Build MediaCLI'
+        run: make package
