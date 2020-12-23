@@ -10,7 +10,7 @@ DESTDIR         ?=
 
 DEB_MAINTAINER  ?= absidue <apt@absidue.me>
 DEB_ARCH        ?= iphoneos-arm
-MEDIA_VERSION   := 1.1.1
+MEDIA_VERSION   := 1.2
 DEB_MEDIA_V     := $(MEDIA_VERSION)
 
 all: build/media build/media.1
