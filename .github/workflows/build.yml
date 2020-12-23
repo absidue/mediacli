@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@master
       
       - name: Install dependencies
-        run: brew install make ldid gnu-sed coreutils fakeroot dpkg
+        run: brew install ldid gnu-sed coreutils fakeroot dpkg
 
       - name: 'Build MediaCLI'
         run: make package

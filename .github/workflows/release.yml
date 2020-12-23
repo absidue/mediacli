@@ -16,7 +16,7 @@ jobs:
           echo "MEDIACLI_VERSION=${MEDIACLI_TAG:1}" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: brew install make ldid gnu-sed coreutils fakeroot dpkg
+        run: brew install ldid gnu-sed coreutils fakeroot dpkg
 
       - name: Download and extract tarball
         run: |
