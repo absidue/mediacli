@@ -39,13 +39,13 @@ rewind 15 seconds
 forward 15 seconds
 .TP
 .B voldown, vol-
-decrease media volume by one step
+decrease the media volume by one step
 .TP
 .B volup, vol+
-increase media volume by one step
+increase the media volume by one step
 .TP
 .B vol{step}
-set media volume to step 0 through 16
+set the media volume to one of the steps numbered 0 through 16
 .SS Getting information:
 .TP
 .B nowplaying, np
@@ -57,8 +57,12 @@ check if any media is playing
 .B artworkuri, awuri
 output the artwork as a base64 data URI
 .TP
+.B volume, vol
+get the current media volume
+.SS Extra options
+.TP
 .B \-\-json, \-j
-Outputs the information as JSON. This option is supported by all commands in this section. Always produces valid JSON. If an error occurs it will be be printed to STDERR.
+Outputs the information as JSON. This option is supported by all commands in the "Getting information" section. Always produces valid JSON. If an error occurs it will be be printed to STDERR.
 .SS Help:
 .TP
 .B help, \-\-help, \-h

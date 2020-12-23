@@ -45,9 +45,9 @@ void help(const char *path) {
             " next                go forward to next track\n"
             " back15              rewind 15 seconds\n"
             " forward15, fwd15    forward 15 seconds\n"
-            " voldown, vol-       lower volume by one step\n"
-            " volup, vol+         increase volume by one step\n"
-            " vol{step}           set volume to step 0 to 16\n"
+            " voldown, vol-       lower media volume by one step\n"
+            " volup, vol+         increase media volume by one step\n"
+            " vol{step}           set media volume to step 0 to 16\n"
             "\n"
             "Getting information:\n"
             "Note: All commands in this section support an optional -j/--json option to enable JSON output\n"
@@ -55,6 +55,7 @@ void help(const char *path) {
             " nowplaying, np      show now playing information\n"
             " isplaying, ip       check if media is playing\n"
             " artworkuri, awuri   get the artwork as a data URI\n"
+            " volume, vol         get the current media volume\n"
             "\n"
             "Help:\n"
             " help, -h, --help    show this message\n\n"
@@ -223,6 +224,17 @@ int main(int argc, const char *argv[]) {
                         }
                     });
                 }
+                else if ([@"volume" isEqualToString:command] || [@"vol" isEqualToString:command]) {
+                    getVolume(^(float volume) {
+                        NSNumberFormatter *formatter = [NSNumberFormatter new];
+                        formatter.usesSignificantDigits = YES;
+                        formatter.minimumSignificantDigits = 0;
+                        formatter.maximumSignificantDigits = 10;
+
+                        const char *volumeString = [[formatter stringFromNumber:@(volume)] UTF8String];
+                        printf("\n%s\n\n", volumeString);
+                    });
+                }
 
                 else if ([@"help" isEqualToString:command] || [@"-h" isEqualToString:command] || [@"--help" isEqualToString:command]) {
                     help(argv[0]);
@@ -293,6 +305,11 @@ int main(int argc, const char *argv[]) {
                             else {
                                 printAsJSON(@{@"uri": @"data:,"});
                             }
+                        });
+                    }
+                    else if ([@"volume" isEqualToString:command] || [@"vol" isEqualToString:command]) {
+                        getVolume(^(float volume) {
+                            printAsJSON(@{@"volume": @(volume)});
                         });
                     }
                     else {
